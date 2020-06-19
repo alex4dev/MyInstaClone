@@ -28,15 +28,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-interface DatabaseListener {
-
-    static enum DataType {USERS, FEEDS}
-
-    void onQueryUsersResult(List<UserModel> result);
-
-    void onQueryFeedsResult(List<FeedModel> result);
-}
-
 public class DatabaseManager {
     private static final String TAG = "DatabaseManager";
 
@@ -74,6 +65,7 @@ public class DatabaseManager {
     }
 
     private static void notifyFeedResult(List<FeedModel> result) {
+
         for (DatabaseListener listener : _listeners) {
             listener.onQueryFeedsResult(result);
         }
@@ -90,6 +82,11 @@ public class DatabaseManager {
                     @Override
                     public void onEvent(@Nullable QuerySnapshot value,
                                         @Nullable FirebaseFirestoreException e) {
+
+                        if(App.isBackground){
+                            Log.w(TAG, "App background", e);
+                            return;
+                        }
 
                         Log.d(TAG, "on feed event");
                         if (e != null) {
@@ -206,7 +203,7 @@ public class DatabaseManager {
 
                                     }
                                 }
-                                // notifyFeedResult(feedsList);
+                                 notifyFeedResult(feedsList);
                             } else {
                                 Log.w(TAG, "Error getting documents.", task.getException());
                             }

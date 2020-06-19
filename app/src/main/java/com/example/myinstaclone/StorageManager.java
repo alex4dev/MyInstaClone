@@ -26,12 +26,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-interface StorageListener {
-    void onUploadSuccess(Uri downloadUri);
-    void onUploadProgress(Double progress);
-    void onUploadFailed();
-}
-
 public class StorageManager extends ThreadPoolExecutor {
     private static final String TAG = "StorageManager";
 
@@ -52,13 +46,13 @@ public class StorageManager extends ThreadPoolExecutor {
 
     private static List<StorageListener> _listeners = new CopyOnWriteArrayList<StorageListener>();
 
-    static void addListener(final StorageListener listener) {
+    public static void addListener(final StorageListener listener) {
         if (null != listener) {
             _listeners.add(listener);
         }
     }
 
-    static void removeListener(final StorageListener listener) {
+    public static void removeListener(final StorageListener listener) {
         if (null != listener) {
             _listeners.remove(listener);
         }
@@ -99,6 +93,7 @@ public class StorageManager extends ThreadPoolExecutor {
 
     public void uploadPhoto(Bitmap photoBitmap) {
         if (photoBitmap == null) {
+            Log.w(TAG, "cancel upload photo - missing bitmap");
             return;
         }
 

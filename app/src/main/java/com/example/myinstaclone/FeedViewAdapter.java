@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -21,14 +22,13 @@ import java.util.List;
 
 public class FeedViewAdapter extends RecyclerView.Adapter<FeedViewAdapter.ViewHolder> {
     private static final String TAG = "FeedViewAdapter";
-
     private List<FeedModel> mDataset;
     private LayoutInflater mInflater;
     private ItemClickListener mClickListener;
     private UserModel user;
 
     // data is passed into the constructor
-    public FeedViewAdapter(Context context, List<FeedModel> dataset) {
+    public FeedViewAdapter(Context context, List<FeedModel> dataset ) {
         this.mInflater = LayoutInflater.from(context);
         this.mDataset = dataset;
     }
@@ -36,21 +36,25 @@ public class FeedViewAdapter extends RecyclerView.Adapter<FeedViewAdapter.ViewHo
     // inflates the row layout from xml when needed
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = mInflater.inflate(R.layout.recyclerview_row_advanced, parent, false);
+        View view = mInflater.inflate(R.layout.fragment_item, parent, false);
         return new ViewHolder(view);
     }
 
     // binds the data to the TextView in each row
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
+        Log.i(TAG, "onBindViewHolder");
+
         final FeedModel data = mDataset.get(position);
         if (data == null) {
             return;
         }
 
+        holder.mItem = data;
         DatabaseManager.addListener(new DatabaseListener() {
             @Override
             public void onQueryUsersResult(List<UserModel> result) {
+
                 String currentUserId = data.getAuthor();
                 String newUserId = result.get(0).getId();
                 Log.d(TAG, "onQueryUsersResult " + newUserId + " " + currentUserId);
@@ -86,14 +90,38 @@ public class FeedViewAdapter extends RecyclerView.Adapter<FeedViewAdapter.ViewHo
         holder.descriptionText.setText(data.getDescription());
     }
 
+
+    @Override
+    public void onViewRecycled(@NonNull ViewHolder holder) {
+        super.onViewRecycled(holder);
+        Log.i(TAG, "onViewRecycled");
+        holder.cleanup();
+    }
+
+    @Override
+    public void onAttachedToRecyclerView(@NonNull RecyclerView recyclerView) {
+        super.onAttachedToRecyclerView(recyclerView);
+        Log.i(TAG, "onAttached");
+    }
+
+    @Override
+    public void onDetachedFromRecyclerView(@NonNull RecyclerView recyclerView) {
+        super.onDetachedFromRecyclerView(recyclerView);
+        Log.i(TAG, "onDetached");
+    }
+
     private void loadImageFromStorage(String name, ImageView imageView) {
         Log.d(TAG, "loadImage - name:" + name);
         if(name == null || name == "") return;
         StorageReference storageReference = FirebaseStorage.getInstance().getReference();
         StorageReference imageRef = storageReference.child(name);
-        GlideApp.with(ApplicationContext.get())
-                .load(imageRef)
-                .into(imageView);
+        try{
+            GlideApp.with(ApplicationContext.get())
+                    .load(imageRef)
+                    .into(imageView);
+        } catch (Exception e){
+
+        }
     }
 
     private void loadImageFromUrl(String url, ImageView imageView){
@@ -101,7 +129,11 @@ public class FeedViewAdapter extends RecyclerView.Adapter<FeedViewAdapter.ViewHo
                 .centerCrop()
                 .placeholder(R.mipmap.ic_launcher_round)
                 .error(R.mipmap.ic_launcher_round);
-        Glide.with(ApplicationContext.get()).load(url).apply(options).into(imageView);
+        try{
+            Glide.with(ApplicationContext.get()).load(url).apply(options).into(imageView);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     // total number of rows
@@ -119,6 +151,8 @@ public class FeedViewAdapter extends RecyclerView.Adapter<FeedViewAdapter.ViewHo
         ImageView feedImage;
         TextView descriptionText;
 
+        public FeedModel mItem;
+
         public ViewHolder(View itemView) {
             super(itemView);
             avatarImage = itemView.findViewById(R.id.avatarImage);
@@ -132,6 +166,10 @@ public class FeedViewAdapter extends RecyclerView.Adapter<FeedViewAdapter.ViewHo
         @Override
         public void onClick(View view) {
             if (mClickListener != null) mClickListener.onItemClick(view, getAdapterPosition());
+        }
+
+        public void cleanup() {
+
         }
     }
 
@@ -149,5 +187,7 @@ public class FeedViewAdapter extends RecyclerView.Adapter<FeedViewAdapter.ViewHo
     public interface ItemClickListener {
         void onItemClick(View view, int position);
     }
+
+
 
 }

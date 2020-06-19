@@ -4,9 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context=".PhotoActivity"
-    tools:showIn="@layout/activity_photo">
+    tools:context=".fragments.UploadFragment">
 
     <ImageView
         android:id="@+id/imagePreview"
@@ -24,9 +22,22 @@
         android:layout_width="200dp"
         android:layout_height="16dp"
         android:progress="0"
-        app:layout_constraintBottom_toBottomOf="@+id/imagePreview"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:visibility="gone" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="@dimen/fab_margin"
+        android:foregroundGravity="left|bottom"
+        android:src="@drawable/ic_send_white_24dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>
+
+

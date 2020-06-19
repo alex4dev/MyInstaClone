@@ -1,11 +1,11 @@
 package com.example.myinstaclone;
 
-import android.content.Context;
 import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
+import com.example.myinstaclone.activities.MainActivity;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
@@ -19,11 +19,6 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-
-interface LoginListener {
-    void onLoginSuccess(FirebaseUser result);
-    void onLoginFailed();
-}
 
 public class LoginManager extends ThreadPoolExecutor {
     private static final String TAG = "LoginManager";
@@ -48,13 +43,13 @@ public class LoginManager extends ThreadPoolExecutor {
 
     private static List<LoginListener> _listeners = new CopyOnWriteArrayList<LoginListener>();
 
-    static void addListener(final LoginListener listener) {
+    public static void addListener(final LoginListener listener) {
         if (null != listener) {
             _listeners.add(listener);
         }
     }
 
-    static void removeListener(final LoginListener listener) {
+    public static void removeListener(final LoginListener listener) {
         if (null != listener) {
             _listeners.remove(listener);
         }
